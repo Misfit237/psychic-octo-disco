@@ -1,0 +1,173 @@
+## Modules
+from tkinter import *
+from serial import *
+import matplotlib.pyplot as plt
+from tkinter.messagebox import *
+from time import*
+import getDataSim
+import getTime
+
+from itertools import count
+from matplotlib.animation import FuncAnimation
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+## Fonctions
+def alert():
+    showinfo("alerte", "Bravo!")
+
+def fullscreen():
+    F2.attributes('-fullscreen', True)
+
+def normal():
+    F2.attributes('-fullscreen', False)
+
+
+def exit_2 ():
+     F1.destroy()
+    # F2.destroy()
+
+def ze_1 ():
+    # F1.state('withdrawn')
+    # fenetre.state('normal')
+
+    F2=Tk()
+
+    sw = F2.winfo_screenwidth()
+    sh = F2.winfo_screenheight()
+
+    F2.geometry(str(sw) + 'x' + str(sh))
+    #F1.resizable(height = False, width = False)
+
+    menubar = Menu(F2)
+
+    menu1 = Menu(menubar, tearoff=0)
+    menu1.add_command(label="Créer", command=alert)
+    menu1.add_command(label="Editer", command=alert)
+    menu1.add_separator()
+    menu1.add_command(label="Quitter", command=F2.destroy)
+    menubar.add_cascade(label="Fichier", menu=menu1)
+
+    menu2 = Menu(menubar, tearoff=0)
+    menu2.add_command(label="Couper", command=alert)
+    menu2.add_command(label="Copier", command=alert)
+    menu2.add_command(label="Coller", command=alert)
+    menubar.add_cascade(label="Outils", menu=menu2)
+
+    menu3 = Menu(menubar, tearoff=0)
+    menu3.add_command(label="Plein écran", command=fullscreen)
+    menu3.add_command(label="Normal", command=normal)
+    menubar.add_cascade(label="Affichage", menu=menu3)
+
+    menu3 = Menu(menubar, tearoff=0)
+    menu3.add_command(label="A propos", command=alert)
+    menubar.add_cascade(label="Aide", menu=menu3)
+
+    F2.config(menu=menubar)
+
+    vrbly1= int(sh)
+    vrbly2= int(sh/2)
+    vrbly3= int(sh/2)
+    vrbly4= int(sh/2)
+
+    vrblx1= int(sw/12.8)
+    vx1= int(sw-vrblx1)
+    vrblx2= int(sw/2)
+    vrblx3= int(sw/4)
+    vrblx4= int(sw/2)
+
+    #print ('vrbl1='+ str(vrbl1) + ',vrbl2=' + str(vrbl2)+ ',vrbl3=' + str(vrbl3)+ ',vrbl4=' + str(vrbl4) +'sw='  + str (sw)+'sh='  + str (sh))
+    F2['bg']='white'
+
+    # frame 1
+    Frame1 = Frame(F2, bg="white", borderwidth=2, relief=GROOVE)
+    Frame1.pack(side=LEFT, padx=5, pady=5, ipadx =vrblx1, ipady= vrbly1)
+
+    # frame 2
+    Frame2 = Frame(F2, bg="red", borderwidth=2, relief=GROOVE)
+    Frame2.pack(side=LEFT, padx=5, pady=5, ipadx =sw-vrblx1, ipady= vrbly1)
+
+    # frame 3
+    Frame3 = Frame(Frame2, bg="green", borderwidth=2, relief=GROOVE)
+    # Frame3.pack(side=TOP, padx=5, pady=5, ipadx =sw-vrblx1, ipady= 270)
+
+    Frame3.pack(side=TOP, padx=5, pady=5, ipadx =sw-vrblx1, ipady= 1)
+
+    # frame 4
+    Frame4 = Frame(Frame2, bg="blue", borderwidth=2, relief=GROOVE)
+    Frame4.pack(side=BOTTOM, padx=5, pady=5, ipadx =sw-vrblx1, ipady= 270)
+
+    # Créer un canvas pour la figure Matplotlib
+    fig = plt.figure()
+    canvas = FigureCanvasTkAgg(fig, master=Frame3)
+    canvas.get_tk_widget().pack(ipadx =90,side= "left")#padx=10, pady=10)
+
+    fig2 = plt.figure()
+    canvas = FigureCanvasTkAgg(fig2, master=Frame3)
+    canvas.get_tk_widget().pack(padx=10, ipadx=65, )#ipady=10,side="right")
+
+
+    import matplotlib.style as mplstyle
+    mplstyle.use('fast')
+
+    now = getTime.now()
+
+    ax1 = fig.add_subplot(221)
+    ax1.set_title("Graphique 1")
+
+    # Dessiner le deuxième graphique dans le canvas
+    ax2 = fig.add_subplot(222)
+    ax2.set_title("Graphique 2")
+
+    # Dessiner le troisième graphique dans le canvas
+    ax3 = fig2.add_subplot(221)
+    ax3.set_title("Graphique 3")
+
+    var=getDataSim.message(now)
+    
+    while (var[0]<30):
+
+        ax1.plot(var[0], var[1])
+        ax2.plot(var[0], var[2])
+        ax3.plot(var[0], var[3])
+        time.sleep(.1)
+
+    # Ajout de labels
+    Label(Frame1, text="Frame 1").pack(padx=10, pady=10)
+    
+    F2.mainloop()
+
+## Interface
+
+
+F1=Tk()
+
+F1.geometry('1200x700')
+F1.resizable(height = False, width = False)
+
+Frame7 = Frame(F1, borderwidth=0, relief=GROOVE, bg= "red")
+Frame7.pack(side=LEFT, padx=0, pady=0)
+
+calque_1= Canvas(Frame7, width=1200,height=700,borderwidth=-2)
+calque_1.pack(fill= "both", expand= True )
+
+button1= Button(Frame7,text="Historique",font=("helvetica",10))
+button1_fenetre = calque_1.create_window(450,520, anchor ="nw", window = button1)
+
+button2= Button(Frame7,text="Nouveau Lancement",font=("helvetica",10), command= ze_1)
+button2_fenetre = calque_1.create_window(575,520, anchor ="nw", window = button2)
+
+exit= Button(Frame7,text="X",font=("helvetica",10), command = exit_2)
+exit_fenetre = calque_1.create_window(1150,20, anchor ="nw", window = exit)
+
+calque_2 = Canvas(Frame7, width =750, height =300, borderwidth=-2, bg ='lightgrey')
+calque_2_fenetre= calque_1.create_window(275,190, anchor ='nw', window = calque_2)
+
+saisi = Label(Frame7, text= "aqszdfgh:")
+saisi_fenetre = calque_1.create_window( 400,120, anchor='nw', window = saisi)
+# saisi.pack(ipadx=10, ipa)
+
+entree =Entry(Frame7, bd=5, width = 50)
+entree_fenetre = calque_1.create_window(490,120, anchor='nw', window= entree)
+# entree.pack(ipadx= 10, ipady=10)
+
+F1.mainloop()
